@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CRUD de Cotización</title>
+</head>
+<body>
+    <h1>CRUD de Cotización</h1>
+
+    <!-- Formulario para crear una cotización -->
+    <h2>Nueva Cotización</h2>
+    <form id="create-form">
+        <label for="Fecha">Fecha:</label>
+        <input type="text" id="Fecha" required>
+        <br><br>
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" required>
+        <br><br>
+        <label for="producto">Producto:</label>
+        <input type="text" id="producto" required>
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" value="1" required>
+        <br><br>
+        <br><br>
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" required>
+        <br><br>
+        <button type="submit">Crear Cotización</button>
+    </form>
+
+    <!-- Tabla para mostrar las cotizaciones existentes -->
+    <h2>Cotizaciones</h2>
+    <table id="cotizaciones-table">
+        <tr>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
+        </tr>
+    </table>
+
+    <!-- Script para manejar la lógica del CRUD -->
+    <script>
+        // Arreglo para almacenar las cotizaciones
+        let cotizaciones = [];
+
+       // Función para mostrar las cotizaciones en la tabla
+function mostrarCotizaciones() {
+    const table = document.getElementById('cotizaciones-table');
+
+    // Limpiar la tabla antes de actualizarla
+    while (table.rows.length > 1) {
+        table.deleteRow(1);
+    }
+
+    // Agregar las cotizaciones a la tabla
+    cotizaciones.forEach(cotizacion => {
+        const row = table.insertRow();
+        row.insertCell().textContent = cotizacion.cliente;
+        row.insertCell().textContent = cotizacion.producto;
+        row.insertCell().textContent = cotizacion.precio;
+
+        // Agregar columna para la cantidad de productos
+        const cantidadCell = row.insertCell();
+        const cantidadInput = document.createElement('input');
+        cantidadInput.type = 'number';
+        cantidadInput.value = 1; // Valor predeterminado de la cantidad
+        cantidadInput.addEventListener('input', () => actualizarTotal());
+        cantidadCell.appendChild(cantidadInput);
+
+        const accionesCell = row.insertCell();
+        const editarButton = document.createElement('button');
+        editarButton.textContent = 'Editar';
+        editarButton.addEventListener('click', () => editarCotizacion(cotizacion));
+        accionesCell.appendChild(editarButton);
+
+        const eliminarButton = document.createElement('button');
+        eliminarButton.textContent = 'Eliminar';
+        eliminarButton.addEventListener('click', () => eliminarCotizacion(cotizacion));
+        accionesCell.appendChild(eliminarButton);
+    });
+
+    // Calcular y mostrar el total
+    const totalRow = table.insertRow();
+    totalRow.insertCell().textContent = 'Total:';
+    totalRow.insertCell();
+    totalRow.insertCell().setAttribute('id', 'total-cell');
+    totalRow.insertCell().textContent = calcularTotal();
+}
+
+// Función para calcular el total actualizado
+function calcularTotal() {
+    let total = 0;
+    cotizaciones.forEach(cotizacion => {
+        const cantidad = parseFloat(cotizacion.cantidad);
+        const precio = parseFloat(cotizacion.precio);
+        total += cantidad * precio;
+    });
+    return total;
+}
+
+// Función para actualizar el total cuando se modifica la cantidad de productos
+function actualizarTotal() {
+    const totalCell = document.getElementById('total-cell');
+    totalCell.textContent = calcularTotal();
+}
+// Función para crear una nueva cotización
+function crearCotizacion(event) {
+    event.preventDefault();
+
+    const cliente = document.getElementById('cliente').value;
+    const producto = document.getElementById('producto').value;
+    const precio = document.getElementById('precio').value;
+    const cantidad = document.getElementById('cantidad').value;
+
+    const cotizacion = { cliente, producto, precio, cantidad };
+    cotizaciones.push(cotizacion);
+
+    document.getElementById('cliente').value = '';
+    document.getElementById('producto').value = '';
+    document.getElementById('precio').value = '';
+    document.getElementById('cantidad').value = 1; // Restaurar valor predeterminado de la cantidad
+
+    mostrarCotizaciones();
+}
+
+// ...
+
+// Asociar el evento de submit del formulario a la función de creación de cotización
+document.getElementById('create-form').addEventListener('submit', crearCotizacion);
+
+// Función para eliminar una cotización existente
+function eliminarCotizacion(cotizacion) {
+    const index = cotizaciones.indexOf(cotizacion);
+    if (index !== -1) {
+        cotizaciones.splice(index, 1);
+        mostrarCotizaciones();
+    }
+}
+// Función para editar una cotización existente
+function editarCotizacion(cotizacion) {
+    const cliente = prompt('Cliente:', cotizacion.cliente);
+    const producto = prompt('Producto:', cotizacion.producto);
+    const precio = prompt('Precio:', cotizacion.precio);
+    const cantidad = prompt('Cantidad:', cotizacion.cantidad);
+
+    cotizacion.cliente = cliente;
+    cotizacion.producto = producto;
+    cotizacion.precio = precio;
+    cotizacion.cantidad = cantidad;
+
+    mostrarCotizaciones();
+}
+
+
+    </script>
+</body>
+</html>
